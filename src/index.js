@@ -4,12 +4,13 @@ const app = express();
 const dotenv = require("dotenv");
 dotenv.config();
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8000;
 
 const usersRoutes = require("./routes/users.js");
 
 const middlewareLogRequest = require("./middleware/logs.js");
 const upload = require("./middleware/multer.js"); //dari middleware multer
+const dbPool = require("./config/database.js");
 
 // app.method(path, handler);
 
@@ -61,4 +62,14 @@ app.use((err, req, res, next) => {
 
 app.listen(PORT, () => {
   console.log(`Server berjalan di http://localhost:${PORT}`);
+});
+
+
+// CARA CEK KONEKSI DATABASE!!!!!!!!!!!!!!!!!!!
+dbPool.connect((err) => {
+  if (err) {
+    console.log(err.message);
+  } else {
+    console.log("Connected");
+  }
 });

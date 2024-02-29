@@ -1,30 +1,26 @@
-// Import modul dbPool dari file ../config/database.js
 const dbPool = require("../config/database.js");
 
-// Mendefinisikan fungsi getAllUsers
-const getAllUsers = () => {
-  const SQLQuery = "SELECT * FROM users";
-  return dbPool.execute(SQLQuery);
+const getAllProducts = () => {
+  const SQLQuery = 'SELECT * FROM allproduct';
+  return dbPool.query(SQLQuery); // Menggunakan metode .query() untuk menjalankan kueri
 };
 
-const creatNewUser = (body) => {
-  const SQLQuery = `INSERT INTO users (name, email, address) 
-                    VALUE ('${body.name}', '${body.email}', '${body.address}')`;
-  return dbPool.execute(SQLQuery);
+const createNewProduct = (body) => {
+  const SQLQuery = 'INSERT INTO allproduct (name, description, price, stock, image) VALUES ($1, $2, $3, $4, $5)';
+  const values = [body.name, body.description, body.price, body.stock, body.image];
+  return dbPool.query(SQLQuery, values); // Menggunakan parameterized query dan .query()
 };
 
-const updateUser = (body, idUser) => {
-  const SQLQuery = `UPDATE users 
-                    SET name='${body.name}', email='${body.email}', address='${body.address}' 
-                    WHERE id=${idUser}`;
-  return dbPool.execute(SQLQuery);
+const updateProduct = (body, productId) => {
+  const SQLQuery = 'UPDATE allproduct SET name=$1, description=$2, price=$3, stock=$4, image=$5 WHERE id=$6';
+  const values = [body.name, body.description, body.price, body.stock, body.image, productId];
+  return dbPool.query(SQLQuery, values); // Menggunakan parameterized query dan .query()
 };
 
-const deleteUser = (idUser) => {
-  const SQLQuery = `DELETE FROM users 
-                    WHERE id=${idUser}`;
-  return dbPool.execute(SQLQuery);
+const deleteProduct = (productId) => {
+  const SQLQuery = 'DELETE FROM allproduct WHERE id=$1';
+  const values = [productId];
+  return dbPool.query(SQLQuery, values); // Menggunakan parameterized query dan .query()
 };
 
-// Mengekspor fungsi getAllUsers agar bisa digunakan di file lain
-module.exports = { getAllUsers, creatNewUser, updateUser, deleteUser };
+module.exports = { getAllProducts, createNewProduct, updateProduct, deleteProduct };

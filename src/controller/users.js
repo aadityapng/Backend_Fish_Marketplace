@@ -1,13 +1,13 @@
 const UsersModel = require("../models/users.js");
 
 // pemangginalan data dari data base bersifat async braarti kita await
-const getAllUsers = async (req, res) => {
+const getAllProducts = async (req, res) => {
   try {
     // sintaks destrukturisasi array [..]
-    const [data] = await UsersModel.getAllUsers();
+    const data = await UsersModel.getAllProducts();
     res.json({
       message: "GET all users succsess",
-      data: data,
+      data: data.rows,
     });
   } catch (error) {
     res.status(500).json({
@@ -17,57 +17,76 @@ const getAllUsers = async (req, res) => {
   }
 };
 
-const createNewUsers = async (req, res) => {
-  const newBody = req.body;
+const createNewProduct = async (req, res) => {
+  const { body } = req;
 
-  if (!newBody.email || !newBody.name || !newBody.address) {
+  // Periksa apakah data yang diperlukan tersedia
+  if (
+    !body.name ||
+    !body.description ||
+    !body.price ||
+    !body.stock ||
+    !body.image
+  ) {
     return res.status(400).json({
-      message: "Anda mengirimkan data yang salah!",
+      message: "Data yang dikirim tidak lengkap!",
       data: null,
     });
   }
 
   try {
-    await UsersModel.creatNewUser(newBody);
+    // Panggil model untuk membuat produk baru
+    await UsersModel.createNewProduct(body);
+
+    // Kirim respons jika berhasil
     res.status(201).json({
-      message: "CREATE new users succsess",
-      data: newBody,
+      message: "Produk baru berhasil dibuat",
+      data: body,
     });
   } catch (error) {
+    // Tangani kesalahan server
     res.status(500).json({
-      message: "Server Error",
-      sereverMessage: error,
+      message: "Terjadi kesalahan pada server",
+      serverMessage: error.message,
     });
   }
 };
 
-const updateUser = async (req, res) => {
-  const idUser = req.params.idUser;
-  const newBody = req.body;
+const updateProduct = async (req, res) => {
+  // Mengambil productId dari parameter permintaan (dari URL)
+  const { productId } = req.params;
+
+  // Mengambil data baru dari body permintaan
+  const { body } = req;
+
   try {
-    await UsersModel.updateUser(newBody, idUser);
+    // Memanggil model untuk melakukan pembaruan produk
+    await UsersModel.updateProduct(body, productId);
+
+    // Mengirim respons jika pembaruan berhasil
     res.json({
-      message: "UPDATE user succsess",
+      message: "Produk berhasil diperbarui",
       data: {
-        id: idUser,
-        ...newBody,
+        id: productId,
+        ...body,
       },
     });
   } catch (error) {
+    // Menangani kesalahan server
     res.status(500).json({
-      message: "Server Error",
-      sereverMessage: error,
+      message: "Terjadi kesalahan pada server",
+      serverMessage: error.message,
     });
   }
 };
 
-const deleteUser = async (req, res) => {
-  const idUser = req.params.idUser;
+const deleteProduct = async (req, res) => {
+  const { productId } = req.params;
   try {
-    await UsersModel.deleteUser(idUser);
+    await UsersModel.deleteProduct(productId);
     res.json({
       message: "DELETE user succsess",
-      data: null, // delete tidak mengurimkan data apapun jadi null
+      data: null, // delete tidak mengirimkan data apapun jadi null
     });
   } catch (error) {
     res.status(500).json({
@@ -77,4 +96,9 @@ const deleteUser = async (req, res) => {
   }
 };
 
-module.exports = { getAllUsers, createNewUsers, updateUser, deleteUser };
+module.exports = {
+  getAllProducts,
+  createNewProduct,
+  updateProduct,
+  deleteProduct,
+};
