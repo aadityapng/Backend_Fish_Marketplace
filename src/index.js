@@ -1,5 +1,9 @@
 const express = require("express");
 const app = express();
+var cors = require("cors");
+const path = require("path");
+
+app.use(cors());
 
 const dotenv = require("dotenv");
 dotenv.config();
@@ -53,6 +57,24 @@ app.post("/upload", upload.single("photo"), (req, res) => {
   });
 });
 
+
+app.get("/:imageName", (req, res) => {
+  const imageName = req.params.imageName;
+
+  // Construct the file path based on the requested image name
+  const imagePath = path.join(__dirname, "../public/images", imageName);
+
+  // Check if the file exists
+  if (require("fs").existsSync(imagePath)) {
+    // If the file exists, send it as a response
+    res.sendFile(imagePath);
+  } else {
+    // If the file doesn't exist, return a 404 error
+    res.status(404).send("Image not found");
+  }
+});
+
+
 // meddleware untuk menghandle error upload dll (error handling)
 app.use((err, req, res, next) => {
   res.json({
@@ -63,7 +85,6 @@ app.use((err, req, res, next) => {
 app.listen(PORT, () => {
   console.log(`Server berjalan di http://localhost:${PORT}`);
 });
-
 
 // CARA CEK KONEKSI DATABASE!!!!!!!!!!!!!!!!!!!
 dbPool.connect((err) => {

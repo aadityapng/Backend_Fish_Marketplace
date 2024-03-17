@@ -4,7 +4,8 @@ const UsersModel = require("../models/users.js");
 const getAllProducts = async (req, res) => {
   try {
     // sintaks destrukturisasi array [..]
-    const data = await UsersModel.getAllProducts();
+    const limit = req.query.limit ? parseInt(req.query.limit) : null; // Menggunakan objek req.query untuk mengakses query string pada bagain server
+    const data = await UsersModel.getAllProducts(limit);
     res.json({
       message: "GET all users succsess",
       data: data.rows,
@@ -85,13 +86,13 @@ const deleteProduct = async (req, res) => {
   try {
     await UsersModel.deleteProduct(productId);
     res.json({
-      message: "DELETE user succsess",
-      data: null, // delete tidak mengirimkan data apapun jadi null
+      message: "Product deleted successfully",
+      data: null,
     });
   } catch (error) {
     res.status(500).json({
       message: "Server Error",
-      sereverMessage: error,
+      serverMessage: error,
     });
   }
 };
